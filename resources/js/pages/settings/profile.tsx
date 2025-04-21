@@ -20,16 +20,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type ProfileForm = {
+    username: string;
     name: string;
     email: string;
+    phone: number;
+    avatar: File | null;
 }
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
-        name: auth.user.name,
-        email: auth.user.email,
+        username: auth.user.username as string,
+        name: auth.user.name as string,
+        email: auth.user.email as string,
+        phone: auth.user.phone as number,
+        avatar: auth.user.avatar || null,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -49,6 +55,22 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
+                        {/* add a input field for username */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="username">Username</Label>
+
+                            <Input
+                                id="username"
+                                className="mt-1 block w-full"
+                                value={data.username}
+                                onChange={(e) => setData('username', e.target.value)}
+                                required
+                                autoComplete="username"
+                                placeholder="Username"
+                            />
+
+                            <InputError className="mt-2" message={errors.username} />
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
@@ -81,6 +103,59 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                             <InputError className="mt-2" message={errors.email} />
                         </div>
+
+                        {/* add a input field to update phone */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">Phone</Label>
+
+                            <Input
+                                id="phone"
+                                className="mt-1 block w-full"
+                                value={data.phone}
+                                onChange={(e) => setData('phone', Number(e.target.value))}
+                                required
+                                autoComplete="phone"
+                                placeholder="Phone number"
+                            />
+
+                            <InputError className="mt-2" message={errors.phone} />
+                        </div>
+
+                        {/* add a field to change the avatar */}
+                        <div className="grid gap-2">
+                            <Label htmlFor="avatar">Avatar</Label>
+
+                            <Input
+                                id="avatar"
+                                type="file"
+                                className="mt-1 block w-full"
+                                onChange={(e) => setData('avatar', e.target.files ? e.target.files[0] : null)}
+                            />
+
+                            <InputError className="mt-2" message={errors.avatar} />
+                        </div>
+
+                        {/* add a image to show the the avatar */}
+                        {data.avatar && (
+                            <div className="mt-4">
+                                <img
+                                    src={URL.createObjectURL(data.avatar)}
+                                    alt="Avatar"
+                                    className="h-32 w-32 rounded-full object-cover"
+                                />
+                            </div>
+                        )}
+
+                        {/* add a field to show the current avatar */}
+                        {auth.user.avatar && !data.avatar && (
+                            <div className="mt-4">
+                                <img
+                                    src={auth.user.avatar}
+                                    alt="Avatar"
+                                    className="h-32 w-32 rounded-full object-cover"
+                                />
+                            </div>
+                        )}
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>
@@ -120,7 +195,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     </form>
                 </div>
 
-                <DeleteUser />
+                {/* <DeleteUser /> */}
             </SettingsLayout>
         </AppLayout>
     );

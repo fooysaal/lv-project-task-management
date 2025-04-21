@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Company extends Model
+class UserType extends Model
 {
     use HasFactory;
     /**
@@ -14,14 +14,19 @@ class Company extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'name',
-        'email',
-        'phone',
-        'address',
-        'country',
-        'website',
         'description',
-        'logo',
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
         'created_at',
         'updated_at',
     ];
@@ -31,8 +36,8 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
     
-    public function userTypes()
+    public function company()
     {
-        return $this->hasMany(UserType::class);
+        return $this->belongsTo(Company::class);
     }
 }
