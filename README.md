@@ -33,10 +33,6 @@ This application enables teams to collaborate efficiently, manage projects, and 
 
 ├── app ├── resources │ └── js │ ├── Components # React components │ ├── Pages # Inertia pages │ ├── Layouts # App & Settings layouts ├── routes │ └── web.php # App routes ├── public │ └── storage # Public avatars/files ├── storage │ └── app/public/avatars # Uploaded avatars └── ...
 
-yaml
-Copy
-Edit
-
 ---
 
 ## ⚙️ Installation
