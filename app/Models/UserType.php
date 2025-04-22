@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserType extends Model
 {
     use HasFactory;
+
+    protected $table = 'user_types';
     /**
      * The attributes that are mass assignable.
      *
@@ -35,7 +37,7 @@ class UserType extends Model
     {
         return $this->hasMany(User::class);
     }
-    
+
     public function company()
     {
         return $this->belongsTo(Company::class);
