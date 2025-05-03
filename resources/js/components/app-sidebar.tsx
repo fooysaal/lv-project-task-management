@@ -4,16 +4,13 @@ import * as React from "react"
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
-  CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
-  FileCodeIcon,
   FileIcon,
-  FileTextIcon,
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  ListIcon,
+  UsersRound,
   SearchIcon,
   Folder,
   UsersIcon,
@@ -48,7 +45,13 @@ const data = {
     {
       title: "Users",
       href: "/users",
-      icon: ListIcon,
+      icon: UsersIcon,
+      items: [
+        {
+          title: "User Types",
+          href: "/users/user-type",
+        },
+      ],
     },
     {
       title: "Analytics",
@@ -61,59 +64,18 @@ const data = {
       icon: FolderIcon,
     },
     {
-      title: "Team",
-      href: '/users',
-      icon: UsersIcon,
+      title: "Teams",
+      href: '/teams',
+      icon: UsersRound,
+      items: [
+        {
+          title: "Team Types",
+          href: "/teams/team-type",
+        },
+    ],
     },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      href: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          href: "#",
-        },
-        {
-          title: "Archived",
-          href: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      href: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          href: "#",
-        },
-        {
-          title: "Archived",
-          href: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      href: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          href: "#",
-        },
-        {
-          title: "Archived",
-          href: "#",
-        },
-      ],
-    },
-  ],
+
   navSecondary: [
     {
         title: 'Repository',
@@ -160,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/dashboard">
+              <a href="/update-company-info">
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Acme Inc.</span>
               </a>
