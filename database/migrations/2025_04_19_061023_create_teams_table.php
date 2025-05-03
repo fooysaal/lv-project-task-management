@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->index();
             $table->foreignId('teams_users_types_id')->nullable()->index();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('description')->nullable();
             $table->string('logo')->nullable();
             $table->timestamps();
