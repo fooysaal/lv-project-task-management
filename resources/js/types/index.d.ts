@@ -1,5 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
+import { PageProps } from '@inertiajs/react'
 
 export interface Auth {
     user: User;
@@ -52,3 +53,25 @@ export interface Company {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+declare module '@inertiajs/react' {
+    interface PageProps {
+      stats: {
+        totalUsers: number
+        newProjects: number
+        completedProjects: number
+        pendingTasks: number
+        completedTasks: number
+        overdueTasks: number
+        userTrend: number
+        projectTrend: number
+        taskTrend: number
+        lastUpdated: string
+        taskTrends: Array<{
+          date: string
+          completed: number
+          pending: number
+        }>
+      }
+    }
+  }

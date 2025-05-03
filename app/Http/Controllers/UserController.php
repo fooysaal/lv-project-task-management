@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use Storage;
 use App\Models\User;
 use Inertia\Inertia;
@@ -16,7 +17,10 @@ class UserController extends Controller
     public function index()
     {
         return inertia('user/index', [
-            'users' => User::with('userType')->get(),
+            'users' => User::where('company_id', auth()->user()->company_id)
+                ->whereNot('id', auth()->user()->id)
+                ->orderBy('name')
+                ->with('userType')->get(),
         ]);
     }
 
@@ -26,7 +30,9 @@ class UserController extends Controller
     public function create()
     {
         return inertia('user/create', [
-            'userTypes' => UserType::all(),
+            'userTypes' => UserType::where('company_id', auth()->user()->company_id)
+                ->select('id', 'name')
+                ->get(),
         ]);
     }
 
@@ -114,5 +120,48 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Show the form for updating company information.
+     */
+    public function companyInfo()
+    {
+        return inertia('company/edit', [
+            'company' => [Company::find(auth()->user()->company_id)],
+        ]);
+    }
+
+    public function updateCompany(Request $request)
+    {
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'company_email' => 'required|string|email|max:255',
+            'company_phone' => 'nullable|min:11',
+            'company_address' => 'nullable|string|max:255',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        if ($request->hasFile('company_logo')) {
+            // Delete the old logo if it exists
+            if ($user->company_logo) {
+                Storage::delete($user->company_logo);
+            }
+
+            // Store the new logo
+            $path = $request->file('company_logo')->store('logos', 'public');
+            $user->company_logo = $path;
+        }
+
+        $user->update([
+            'company_name' => $request->company_name,
+            'company_email' => $request->company_email,
+            'company_phone' => $request->company_phone,
+            'company_address' => $request->company_address,
+        ]);
+
+        return redirect()->back()->with('success', 'Company information updated successfully.');
     }
 }
