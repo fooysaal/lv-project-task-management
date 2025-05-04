@@ -21,8 +21,15 @@ class Team extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
     public function users()
+{
+    return $this->belongsToMany(User::class, 'teams_users')
+        ->withTimestamps(); // optional if your pivot table has timestamps
+}
+
+    public function teamType()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(TeamType::class, 'team_type_id');
     }
 }

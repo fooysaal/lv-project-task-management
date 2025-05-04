@@ -30,7 +30,11 @@ class UserController extends Controller
     public function create()
     {
         return inertia('user/create', [
-            'userTypes' => UserType::where('company_id', auth()->user()->company_id)
+            'userTypes' => UserType::where(function ($query) {
+                    $query->where('company_id', auth()->user()->company_id)
+                          ->orWhereNull('company_id');
+                })
+                ->where('is_active', 1)
                 ->select('id', 'name')
                 ->get(),
         ]);

@@ -2,26 +2,103 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\TeamType;
+use App\Models\TeamsUser;
 use Illuminate\Http\Request;
 
 class TeamController extends Controller
 {
     public function index()
     {
-        return inertia('team/index');
+        return Inertia::render('teams/index', [
+            'teams' => Team::with(['teamType', 'users'])->get(),
+        ]);
     }
 
     public function create()
     {
-        return inertia('team/create');
+        return Inertia::render('teams/create', [
+            'teamTypes' => TeamType::where('is_active', 1)->where('company_id', auth()->user()->company_id)->get(),
+            'users' => User::where('company_id', auth()->user()->company_id)
+            ->whereNotIn('user_type_id', [1, 2])
+            ->whereNot('id', auth()->user()->id)
+            ->get(),
+        ]);
     }
 
-    public function edit($id)
-    {
-        return inertia('team/Edit', ['id' => $id]);
+    public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'team_type_id' => 'required|exists:teams_users_types,id',
+        'user_ids' => 'array',
+        'user_ids.*' => 'exists:users,id',
+    ]);
+
+    $team = new Team();
+    $team->name = $validated['name'];
+    $team->description = $validated['description'] ?? null;
+    $team->teams_users_types_id = $validated['team_type_id'];
+    $team->company_id = auth()->user()->company_id;
+    $team->logo = null;
+    $team->save();
+
+    // No unnecessary empty entry
+    $teamUsers = [];
+
+    foreach ($validated['user_ids'] as $userId) {
+        $teamUsers[] = new TeamsUser([
+            'user_id' => $userId,
+            'team_id' => $team->id,
+        ]);
     }
-    public function show($id)
+
+    $team->users()->saveMany($teamUsers);
+
+    return redirect()->route('teams.index');
+}
+
+
+    public function edit(Team $team)
     {
-        return inertia('team/Show', ['id' => $id]);
+        return Inertia::render('teams/edit', [
+            'team' => $team->load(['teamType', 'users']),
+            'teamTypes' => TeamType::where('is_active', 1)->where('company_id', auth()->user()->company_id)->get(),
+            'users' => User::where('company_id', auth()->user()->company_id)
+            ->whereNotIn('user_type_id', [1, 2])
+            ->whereNot('id', auth()->user()->id)
+            ->get(),
+        ]);
+    }
+
+    public function update(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'team_type_id' => 'required|exists:team_types,id',
+            'user_ids' => 'array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $team->update($validated);
+
+        if (isset($validated['user_ids'])) {
+            $team->users()->sync($validated['user_ids']);
+        }
+
+        return redirect()->route('teams.index');
+    }
+
+    public function destroy(Team $team)
+    {
+        $team->users()->detach();
+        $team->delete();
+
+        return redirect()->route('teams.index');
     }
 }

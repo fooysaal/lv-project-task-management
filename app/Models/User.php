@@ -68,4 +68,34 @@ class User extends Authenticatable
         return $this->avatar ? asset("storage/{$this->avatar}") : null;
     }
 
+    public function teams()
+{
+    return $this->belongsToMany(Team::class, 'teams_users');
+}
+
+
+    public function isAdmin()
+    {
+        return strtolower($this->userType->name ?? '') === 'admin';
+    }
+
+    public function isSuperAdmin()
+    {
+        return strtolower($this->userType->name ?? '') === 'super admin';
+    }
+
+    public function isProjectManager()
+    {
+        return strtolower($this->userType->name ?? '') === 'project manager';
+    }
+
+    public function isManager()
+    {
+        return strtolower($this->userType->name ?? '') === 'manager';
+    }
+
+    public function isUser()
+    {
+        return strtolower($this->userType->name ?? '') === 'user';
+    }
 }

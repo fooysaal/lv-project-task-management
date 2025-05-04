@@ -18,4 +18,9 @@ class TeamType extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class, 'team_type_id');
+    }
 }
