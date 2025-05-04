@@ -12,9 +12,22 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+Route::get('/support', function () {
+    return Inertia::render('settings/support');
+})->name('support');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
+        // ->middleware('role:admin,superadmin')
+        ->name('dashboard');
+
+    Route::get('manager-dashboard', [DashboardController::class, 'manager'])
+        // ->middleware('role:projectmanager,manager')
+        ->name('manager.dashboard');
+
+    Route::get('user-dashboard', [DashboardController::class, 'user'])
+        ->middleware('role:user,developer')
+        ->name('user.dashboard');
 
     Route::resource('users/user-type', UserTypeController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::put('users/user-type/{id}/toggle-status', [UserTypeController::class, 'toggleStatus']);
