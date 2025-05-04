@@ -11,7 +11,6 @@ class UserTypeController extends Controller
     {
         // Fetch all user types for the authenticated user's company
         $userTypes = UserType::where('company_id', auth()->user()->company_id)
-            ->orWhere('company_id', null)
             ->orderBy('name')
             ->get();
         // Return the user types to the view

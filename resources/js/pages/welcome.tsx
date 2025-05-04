@@ -14,7 +14,16 @@ export default function Welcome() {
                 <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
                     <nav className="flex w-full items-center justify-between">
                         {/* Logo Section */}
-                        <div className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">Project Task Management System</div>
+                        <div className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
+                            <Link href="#" className="flex items-center gap-2">
+                                <img
+                                    src="image.png"
+                                    alt="Logo"
+                                    className="h-16 w-16 rounded-full border border-[#19140035] dark:border-[#3E3E3A]"
+                                />
+                                PTMS
+                            </Link>
+                        </div>
 
                         {/* Auth Section */}
                         <div className="flex items-center gap-4">

@@ -1,143 +1,114 @@
-"use client"
+import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { type NavItem } from '@/types';
+import { Link } from '@inertiajs/react';
+import { BookOpen, FileCode, Folder, LayoutGrid, UserCircle, Users, Shield, Activity, Tag, Copy } from 'lucide-react';
+import AppLogo from './app-logo';
 
-import * as React from "react"
-import {
-  ArrowUpCircleIcon,
-  BarChartIcon,
-  ClipboardListIcon,
-  DatabaseIcon,
-  FileIcon,
-  FolderIcon,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  UsersRound,
-  SearchIcon,
-  Folder,
-  UsersIcon,
-} from "lucide-react"
-
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
+const mainNavItems: NavItem[] = [
     {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboardIcon,
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: LayoutGrid,
     },
     {
-      title: "Users",
-      href: "/users",
-      icon: UsersIcon,
+      title: 'User Management',
+      icon: UserCircle,
       items: [
         {
-          title: "User Types",
-          href: "/users/user-type",
+          title: 'All Users',
+          href: '/users',
+          icon: Users, // You can use different icons for subitems
+        },
+        {
+          title: 'User Types',
+          href: '/users/user-type',
+          icon: Shield,
+        },
+        {
+          title: 'Activity Log',
+          href: '/users/activity',
+          icon: Activity,
         },
       ],
     },
     {
-      title: "Analytics",
-      href: "#",
-      icon: BarChartIcon,
-    },
-    {
-      title: "Projects",
-      href: "#",
-      icon: FolderIcon,
-    },
-    {
-      title: "Teams",
-      href: '/teams',
-      icon: UsersRound,
+      title: 'Project Management',
+      icon: FileCode,
       items: [
         {
-          title: "Team Types",
-          href: "/teams/team-type",
+          title: 'All Projects',
+          href: '/projects',
+          icon: Folder,
         },
-    ],
+        {
+          title: 'Categories',
+          href: '/projects/categories',
+          icon: Tag,
+        },
+        {
+          title: 'Templates',
+          href: '/projects/templates',
+          icon: Copy,
+        },
+      ],
     },
-  ],
+    {
+      title: 'Team Management',
+      icon: Users,
+      items: [
+        {
+          title: 'All Teams',
+          href: '/teams',
+          icon: Users,
+        },
+        {
+          title: 'Team Types',
+          href: '/teams/team-type',
+          icon: Shield,
+        },
+      ],
+    },
+  ];
 
-  navSecondary: [
+const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',
         icon: Folder,
     },
     {
-      title: "Get Help",
-      href: "#",
-      icon: HelpCircleIcon,
+        title: 'Documentation',
+        href: 'https://laravel.com/docs/starter-kits',
+        icon: BookOpen,
     },
-    {
-      title: "Search",
-      href: "#",
-      icon: SearchIcon,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      href: "#",
-      icon: DatabaseIcon,
-    },
-    {
-      name: "Reports",
-      href: "#",
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Word Assistant",
-      href: "#",
-      icon: FileIcon,
-    },
-  ],
-}
+];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="/update-company-info">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
-  )
+export function AppSidebar() {
+    return (
+        <Sidebar collapsible="icon" variant="inset">
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton size="lg" asChild>
+                            <Link href="/dashboard" prefetch>
+                                <AppLogo />
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
+
+            <SidebarContent>
+                <NavMain items={mainNavItems} />
+            </SidebarContent>
+
+            <SidebarFooter>
+                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavUser />
+            </SidebarFooter>
+        </Sidebar>
+    );
 }
