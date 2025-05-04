@@ -19,10 +19,11 @@ export interface NavGroup {
 
 export interface NavItem {
     title: string;
-    href: string;
-    icon?: LucideIcon | null;
+    href?: string;
+    icon: React.ComponentType<{ className?: string }>;
+    items?: NavItem[]; // For submenu items
     isActive?: boolean;
-}
+  }
 
 export interface SharedData {
     name: string;
