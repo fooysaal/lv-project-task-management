@@ -143,4 +143,47 @@ class DashboardController extends Controller
             ];
         });
     }
+
+    public function manager()
+    {
+        $organizationId = auth()->user()->company_id;
+
+        // Cache key specific to this organization
+        $cacheKey = 'manager-dashboard-stats:org:' . $organizationId;
+
+        $stats = cache()->remember($cacheKey, now()->addMinutes(30), function() use ($organizationId) {
+            return [
+                'totalUsers' => User::where('company_id', $organizationId)->count(),
+                'totalProjects' => Project::where('company_id', $organizationId)->count(),
+                'totalTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })->count(),
+            ];
+        });
+
+        return Inertia::render('manager-dashboard', [
+            'stats' => $stats,
+        ]);
+    }
+
+    public function user()
+    {
+        $organizationId = auth()->user()->company_id;
+
+        // Cache key specific to this organization
+        $cacheKey = 'user-dashboard-stats:org:' . $organizationId;
+
+        $stats = cache()->remember($cacheKey, now()->addMinutes(30), function() use ($organizationId) {
+            return [
+                'totalProjects' => Project::where('company_id', $organizationId)->count(),
+                'totalTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })->count(),
+            ];
+        });
+
+        return Inertia::render('user-dashboard', [
+            'stats' => $stats,
+        ]);
+    }
 }
