@@ -45,7 +45,7 @@ const mainNavItems: NavItem[] = [
         },
         {
           title: 'Categories',
-          href: '/projects/categories',
+          href: '/project-categories',
           icon: Tag,
         },
         {

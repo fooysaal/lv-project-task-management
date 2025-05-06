@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectsCategory extends Model
 {
-    protected $fillable = [
-        'name',
-        'description',
-        'company_id',
-    ];
+    protected $fillable = ['company_id', 'name', 'description', 'is_active'];
 
     public function projects()
     {

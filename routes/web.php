@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TeamTypeController;
 use App\Http\Controllers\UserTypeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectsCategoryController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -33,6 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('users/user-type/{id}/toggle-status', [UserTypeController::class, 'toggleStatus']);
     Route::resource('teams/team-type', TeamTypeController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::put('teams/team-type/{id}/toggle-status', [TeamTypeController::class, 'toggleStatus']);
+
+    Route::resource('project-categories', ProjectsCategoryController::class);
+    Route::put('project-categories/{id}/toggle-status', [ProjectsCategoryController::class, 'toggleStatus']);
 
     Route::resource('users', UserController::class);
     Route::get('update-company-info', [UserController::class, 'companyInfo']);
