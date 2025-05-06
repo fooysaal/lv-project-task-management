@@ -2,7 +2,8 @@
 
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react'; // Added usePage here
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -20,22 +21,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+type Team = {
+  id: number;
+  name: string;
+  description: string;
+  team_type: { name: string } | null;
+  users: User[];
+};
 
 export default function TeamIndex() {
-  const { props } = usePage(); // Properly using usePage
-  const { teams } = props as {
-    teams: {
-      id: number;
-      name: string;
-      description: string;
-      team_type: { name: string };
-      users_count: number;
-    }[];
-  };
+  const { props } = usePage();
+  const { teams } = props as { teams: Team[] };
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Teams', href: '/teams' },
-  ];
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+
+  const breadcrumbs: BreadcrumbItem[] = [{ title: 'Teams', href: '/teams' }];
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -68,10 +82,10 @@ export default function TeamIndex() {
                 <TableRow key={team.id}>
                   <TableCell className="font-medium">{team.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{team.team_type.name}</Badge>
+                    <Badge variant="outline">{team.team_type?.name ?? 'N/A'}</Badge>
                   </TableCell>
                   <TableCell>{team.description}</TableCell>
-                  <TableCell>{team.users_count}</TableCell>
+                  <TableCell>{team.users.length}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -93,6 +107,9 @@ export default function TeamIndex() {
                             Delete
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSelectedTeam(team)}>
+                          View Members
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -102,6 +119,29 @@ export default function TeamIndex() {
           </Table>
         </div>
       </div>
+
+      {/* Modal for Team Members */}
+      <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedTeam?.name} Members
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {selectedTeam?.users.length ? (
+              selectedTeam.users.map((user) => (
+                <div key={user.id} className="border p-2 rounded">
+                  <div className="font-semibold">{user.name}</div>
+                  <div className="text-sm text-muted-foreground">{user.email}</div>
+                </div>
+              ))
+            ) : (
+              <p>No members in this team.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }

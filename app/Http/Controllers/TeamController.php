@@ -13,8 +13,10 @@ class TeamController extends Controller
 {
     public function index()
     {
+        $teams = Team::with(['teamType', 'users:id,name,email'])->get();
+
         return Inertia::render('teams/index', [
-            'teams' => Team::with(['teamType', 'users'])->get(),
+            'teams' => $teams,
         ]);
     }
 
@@ -30,37 +32,31 @@ class TeamController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
-        'team_type_id' => 'required|exists:teams_users_types,id',
-        'user_ids' => 'array',
-        'user_ids.*' => 'exists:users,id',
-    ]);
-
-    $team = new Team();
-    $team->name = $validated['name'];
-    $team->description = $validated['description'] ?? null;
-    $team->teams_users_types_id = $validated['team_type_id'];
-    $team->company_id = auth()->user()->company_id;
-    $team->logo = null;
-    $team->save();
-
-    // No unnecessary empty entry
-    $teamUsers = [];
-
-    foreach ($validated['user_ids'] as $userId) {
-        $teamUsers[] = new TeamsUser([
-            'user_id' => $userId,
-            'team_id' => $team->id,
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'team_type_id' => 'required|exists:teams_users_types,id',
+            'user_ids' => 'array',
+            'user_ids.*' => 'exists:users,id',
         ]);
+
+        $team = new Team();
+        $team->name = $validated['name'];
+        $team->description = $validated['description'] ?? null;
+        $team->teams_users_types_id = $validated['team_type_id'];
+        $team->company_id = auth()->user()->company_id;
+        $team->logo = null;
+        $team->save();
+
+        // Ensure unique user IDs
+        $userIds = array_unique($validated['user_ids']);
+
+        // Attach users (pivot table)
+        $team->users()->attach($userIds);
+
+        return redirect()->route('teams.index');
     }
-
-    $team->users()->saveMany($teamUsers);
-
-    return redirect()->route('teams.index');
-}
 
 
     public function edit(Team $team)
@@ -80,7 +76,7 @@ class TeamController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'team_type_id' => 'required|exists:team_types,id',
+            'teams_users_types_id' => 'required|exists:teams_users_types,id',
             'user_ids' => 'array',
             'user_ids.*' => 'exists:users,id',
         ]);

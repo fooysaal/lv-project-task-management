@@ -30,6 +30,6 @@ class Team extends Model
 
     public function teamType()
     {
-        return $this->belongsTo(TeamType::class, 'team_type_id');
+        return $this->belongsTo(TeamType::class, 'id');
     }
 }
