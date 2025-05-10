@@ -76,18 +76,22 @@ class TeamController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'teams_users_types_id' => 'required|exists:teams_users_types,id',
+            'team_type_id' => 'required|exists:teams_users_types,id',
             'user_ids' => 'array',
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $team->update($validated);
+        $team->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'teams_users_types_id' => $validated['team_type_id'],
+            'company_id' => auth()->user()->company_id,
+            'logo' => null,
+        ]);
 
-        if (isset($validated['user_ids'])) {
-            $team->users()->sync($validated['user_ids']);
-        }
+        $team->users()->sync($validated['user_ids']);
 
-        return redirect()->route('teams.index');
+        return redirect()->route('teams.index')->with('success', 'Team updated successfully.');
     }
 
     public function destroy(Team $team)
