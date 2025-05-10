@@ -21,9 +21,15 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            CompanySeeder::class,
+            UserSeeder::class,
             UserTypeSeeder::class,
             TeamTypeSeeder::class,
+            TeamSeeder::class,
             ProjectCategorySeeder::class,
+            ProjectSeeder::class,
+            ProjectRepositorySeeder::class,
+            ProjectTaskSeeder::class,
         ]);
     }
 }
