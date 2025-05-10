@@ -4,13 +4,13 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileCode, Folder, LayoutGrid, UserCircle, Users, Shield, Activity, Tag, Copy } from 'lucide-react';
+import { BookOpen, FileCode, Folder, LayoutGrid, UserCircle, Users, Shield, Activity, Tag, Copy, TableOfContents } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
       title: 'Dashboard',
-      href: '/dashboard',
+      href: '/',
       icon: LayoutGrid,
     },
     {
@@ -35,6 +35,22 @@ const mainNavItems: NavItem[] = [
       ],
     },
     {
+        title: 'Team Management',
+        icon: Users,
+        items: [
+          {
+            title: 'All Teams',
+            href: '/teams',
+            icon: Users,
+          },
+          {
+            title: 'Team Types',
+            href: '/teams/team-type',
+            icon: Shield,
+          },
+        ],
+      },
+    {
       title: 'Project Management',
       icon: FileCode,
       items: [
@@ -56,18 +72,13 @@ const mainNavItems: NavItem[] = [
       ],
     },
     {
-      title: 'Team Management',
-      icon: Users,
+      title: 'Task Management',
+      icon: TableOfContents,
       items: [
         {
-          title: 'All Teams',
-          href: '/teams',
-          icon: Users,
-        },
-        {
-          title: 'Team Types',
-          href: '/teams/team-type',
-          icon: Shield,
+          title: 'All Tasks',
+          href: '/projects',
+          icon: Folder,
         },
       ],
     },
@@ -75,15 +86,15 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: 'Project Repositories',
+        href: 'projects/repositories',
         icon: Folder,
     },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
+    // {
+    //     title: 'Documentation',
+    //     href: 'https://laravel.com/docs/starter-kits',
+    //     icon: BookOpen,
+    // },
 ];
 
 export function AppSidebar() {

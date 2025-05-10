@@ -16,11 +16,7 @@ export default function Welcome() {
                         {/* Logo Section */}
                         <div className="text-lg font-semibold text-[#1b1b18] dark:text-[#EDEDEC]">
                             <Link href="#" className="flex items-center gap-2">
-                                <img
-                                    src="image.png"
-                                    alt="Logo"
-                                    className="h-16 w-16 rounded-full border border-[#19140035] dark:border-[#3E3E3A]"
-                                />
+                                <img src="image.png" alt="Logo" className="h-16 w-16 rounded-full border border-[#19140035] dark:border-[#3E3E3A]" />
                                 PTMS
                             </Link>
                         </div>
@@ -29,7 +25,13 @@ export default function Welcome() {
                         <div className="flex items-center gap-4">
                             {auth.user ? (
                                 <Link
-                                    href={route('dashboard')}
+                                    href={route(
+                                        auth.user.user_type_id === 1
+                                            ? 'dashboard'
+                                            : auth.user.user_type_id === 2
+                                              ? 'manager.dashboard'
+                                              : 'user.dashboard',
+                                    )}
                                     className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                                 >
                                     Dashboard
@@ -156,9 +158,7 @@ export default function Welcome() {
                             Contact Us
                         </Link>
                     </nav>
-                    <div className="mt-4 text-center text-sm text-gray-500">
-                        &copy; {new Date().getFullYear()} PTMS. All rights reserved.
-                    </div>
+                    <div className="mt-4 text-center text-sm text-gray-500">&copy; {new Date().getFullYear()} PTMS. All rights reserved.</div>
                     <div className="mt-2 text-center text-sm text-gray-500">Built with ❤️ using Laravel and React.</div>
                     <div className="mt-2 text-center text-sm text-gray-500">
                         <Link href={route('login')} className="text-blue-500 hover:underline">
