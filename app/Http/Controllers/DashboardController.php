@@ -29,7 +29,7 @@ class DashboardController extends Controller
 
                 // Project statistics
                 'newProjects' => Project::where('company_id', $organizationId)
-                    ->where('status', 'in_progress')->count(),
+                    ->where('status', '!=', 'completed')->count(),
                 'completedProjects' => Project::where('company_id', $organizationId)
                     ->where('status', 'completed')->count(),
                 'projectTrend' => $this->calculateProjectTrend($organizationId),
@@ -78,12 +78,12 @@ class DashboardController extends Controller
     protected function calculateProjectTrend($organizationId)
     {
         $currentPeriodCount = Project::where('company_id', $organizationId)
-            ->where('status', 'in_progress')
+            ->where('status', '!=', 'completed')
             ->where('created_at', '>=', now()->subDays(30))
             ->count();
 
         $previousPeriodCount = Project::where('company_id', $organizationId)
-            ->where('status', 'in_progress')
+            ->where('status', '!=', 'completed')
             ->whereBetween('created_at', [now()->subDays(60), now()->subDays(30)])
             ->count();
 
