@@ -75,7 +75,7 @@ export default function ProjectIndex({ projects = [] }: { projects: any[] }) {
                                 <TableHead className='text-center'>Priority</TableHead>
                                 <TableHead className='text-center'>Progress</TableHead>
                                 <TableHead className='text-center'>Dates</TableHead>
-                                <TableHead className='text-center'>Budget</TableHead>
+                                {/* <TableHead className='text-center'>Budget</TableHead> */}
                                 <TableHead className='text-center'>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -137,9 +137,9 @@ export default function ProjectIndex({ projects = [] }: { projects: any[] }) {
                                             <TableCell>
                                                 {project.start_date} → {project.end_date}
                                             </TableCell>
-                                            <TableCell>
+                                            {/* <TableCell>
                                                 {project.budget} {project.currency}
-                                            </TableCell>
+                                            </TableCell> */}
                                             <TableCell className="space-x-2">
                                                 {project.deleted_at ? (
                                                     <>

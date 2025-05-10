@@ -13,6 +13,13 @@ class ProjectsTask extends Model
         'project_id',
         'assigned_to',
         'due_date',
+        'priority',
+        'estimated_time',
+        'spent_time',
+        'progress',
+        'created_by',
+        'updated_by',
+        'attachments',
     ];
 
     public function project()
@@ -27,5 +34,10 @@ class ProjectsTask extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    public function assignedTo()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }
