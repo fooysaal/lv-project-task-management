@@ -77,7 +77,7 @@ const mainNavItems: NavItem[] = [
       items: [
         {
           title: 'All Tasks',
-          href: '/projects',
+          href: '/projects/tasks',
           icon: Folder,
         },
       ],
