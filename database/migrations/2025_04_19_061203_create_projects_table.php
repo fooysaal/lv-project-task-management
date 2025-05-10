@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('currency')->default('USD');
             $table->string('attachments')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
