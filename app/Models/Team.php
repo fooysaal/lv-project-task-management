@@ -23,10 +23,10 @@ class Team extends Model
     }
 
     public function users()
-{
-    return $this->belongsToMany(User::class, 'teams_users')
-        ->withTimestamps(); // optional if your pivot table has timestamps
-}
+    {
+        return $this->belongsToMany(User::class, 'teams_users')
+            ->withTimestamps(); // optional if your pivot table has timestamps
+    }
 
     public function teamType()
     {
