@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->nullable()->index();
-            $table->string('name')->unique();
+            $table->foreignId('teams_users_types_id')->nullable()->index();
+            $table->string('name');
             $table->string('description')->nullable();
             $table->string('logo')->nullable();
             $table->timestamps();

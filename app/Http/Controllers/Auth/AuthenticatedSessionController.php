@@ -33,8 +33,25 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
-        // return Inertia::location(route('dashboard'));
+        $user = Auth::user();
+        // if ($user->is_active == 0) {
+        //     Auth::guard('web')->logout();
+        //     $request->session()->invalidate();
+        //     $request->session()->regenerateToken();
+
+        //     return redirect('/support')->with('error', 'Your account is inactive. Please contact support.');
+        // }
+
+        return redirect()->intended(match (true) {
+            $user->isSuperAdmin(),
+            $user->isAdmin() => route('dashboard'),
+
+            $user->isProjectManager(),
+            $user->isManager() => route('manager.dashboard'),
+
+            default => route('user.dashboard'),
+        });
+
     }
 
     /**

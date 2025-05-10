@@ -1,8 +1,14 @@
 import { usePage } from '@inertiajs/react';
 import AppLogoIcon from './app-logo-icon';
+import type { Auth } from '@/types/index';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
+
+interface PageProps extends InertiaPageProps {
+    auth: Auth;
+  }
 
 export default function AppLogo() {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<PageProps>().props;
 
     return (
         <>

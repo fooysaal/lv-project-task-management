@@ -3,6 +3,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/components/ui/button"
 import { Edit, Eye, Trash } from 'lucide-react';
+import type { PageProps } from '@/types';
 import {
     Table,
     TableBody,
@@ -20,7 +21,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Users() {
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  user_type: {
+    id: number;
+    name: string;
+  };
+}
+
+interface UsersProps extends PageProps {
+  users: User[];
+}
+
+export default function Users({ users }: UsersProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
@@ -43,196 +58,32 @@ export default function Users() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
-                        <TableCell className="font-medium"> 1</TableCell>
-                        <TableCell>John Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
+                        {users.map((user, index) => (
+                            <TableRow key={user.id}>
+                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>
+                                <a href={`mailto:${user.email}`}>{user.email}</a>
+                            </TableCell>
+                            
+                            <TableCell>{user.user_type?.name ?? 'N/A'}</TableCell>
+                            <TableCell className="flex gap-2">
+                                <Link href={`/users/${user.id}`}>
+                                <Button variant="outline" size="icon">
+                                    <Eye size={16} />
+                                </Button>
+                                </Link>
+                                <Link href={`/users/${user.id}/edit`}>
+                                <Button variant="outline" size="icon">
+                                    <Edit size={16} />
+                                </Button>
+                                </Link>
+                                <Button variant="destructive" size="icon" onClick={() => handleDelete(user.id)}>
                                 <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 2</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 3</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 4</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 5</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 6</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 7</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 8</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 9</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
-                        <TableRow>
-                        <TableCell className="font-medium"> 10</TableCell>
-                        <TableCell>Jane Doe</TableCell>
-                        <TableCell>
-                            <a href="mailto:john@mail.com">john@mail.com</a>
-                        </TableCell>
-                        <TableCell>Admin</TableCell>
-                        <TableCell className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                                <Eye size={16} />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                                <Edit size={16} />
-                            </Button>
-                            <Button variant="destructive" size="icon">
-                                <Trash size={16} />
-                            </Button>
-                        </TableCell>
-                        </TableRow>
+                                </Button>
+                            </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </div>

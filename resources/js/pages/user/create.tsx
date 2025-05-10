@@ -1,154 +1,192 @@
+"use client";
+
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { useForm, Head, Link } from '@inertiajs/react';
+import { useForm, Head, Link, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { Transition } from '@headlessui/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { LoaderPinwheel } from "lucide-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Create User',
-        href: '/users/create',
-    },
+  {
+    title: 'Create User',
+    href: '/users/create',
+  },
 ];
 
 export default function CreateUsers() {
-    const { data, setData, post, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
+  const { userTypes } = usePage().props as {
+    userTypes: { id: number; name: string }[];
+  };
+
+  const { data, setData, post, errors, reset, processing, recentlySuccessful } = useForm({
+    user_type_id: '',
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    password_confirmation: '',
+  });
+
+  const submit: FormEventHandler = (e) => {
+    e.preventDefault();
+
+    post(route('users.store'), {
+      onSuccess: () => reset(),
     });
+  };
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Users" />
 
-        post(route('users.store'), {
-            onSuccess: () => reset(), // optional: clear the form on success
-        });
-    };
+      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <HeadingSmall title="Create User" description="Create a new user" />
+          <Link href="/users">
+            <Button variant="outline">Back to Users</Button>
+          </Link>
+        </div>
 
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Users" />
+        <form onSubmit={submit} className="space-y-6">
+          {/* User Type Select */}
+          <div className="grid gap-2">
+            <Label htmlFor="user_type_id">User Type</Label>
+            <Select
+              onValueChange={(value) => setData('user_type_id', value)}
+              defaultValue={data.user_type_id}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select user type" />
+              </SelectTrigger>
+              <SelectContent>
+                {userTypes.map((type) => (
+                  <SelectItem key={type.id} value={String(type.id)}>
+                    {type.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <InputError message={errors.user_type_id} className="mt-2" />
+          </div>
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                    <HeadingSmall title="Create User" description="Create a new user" />
-                    <Link href="/users">
-                        <Button variant="outline">Back to Users</Button>
-                    </Link>
-                </div>
+          {/* Name */}
+          <div className="grid gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={data.name}
+              onChange={(e) => setData('name', e.target.value)}
+              required
+              placeholder="Full name"
+              autoComplete="name"
+            />
+            <InputError message={errors.name} className="mt-2" />
+          </div>
 
-                <div className="space-y-6">
-                    <form onSubmit={submit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="user-type">User Type</Label>
+          {/* Email */}
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={data.email}
+              onChange={(e) => setData('email', e.target.value)}
+              required
+              placeholder="Email address"
+              autoComplete="email"
+            />
+            <InputError message={errors.email} className="mt-2" />
+          </div>
 
-                            {/* add a select field to choose between light, dark and system */}
-                            <Select id="user-type" onValueChange={(value) => setData('user_type', value)}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="User Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="light">Light</SelectItem>
-                                    <SelectItem value="dark">Dark</SelectItem>
-                                    <SelectItem value="system">System</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <InputError className="mt-2" message={errors.user_type} />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-
-                            <Input
-                                id="name"
-                                className="mt-1 block w-full"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                required
-                                autoComplete="name"
-                                placeholder="Full name"
-                            />
-
-                            <InputError className="mt-2" message={errors.name} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
-
-                            <Input
-                                id="email"
-                                type="email"
-                                className="mt-1 block w-full"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                required
-                                autoComplete="username"
-                                placeholder="Email address"
-                            />
-
-                            <InputError className="mt-2" message={errors.email} />
-                        </div>
-                        {/* add a input field to update phone */}
-                        {/* <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone</Label>
-
-                            <Input
-                                id="phone"
-                                className="mt-1 block w-full"
-                                value={data.phone}
-                                onChange={(e) => setData('phone', Number(e.target.value))}
-                                required
-                                autoComplete="phone"
-                                placeholder="Phone number"
-                            />
-
-                            <InputError className="mt-2" message={errors.phone} />
-                        </div> */}
-
-                        {/* add a field to change the avatar */}
-                        {/* <div className="grid gap-2">
-                            <Label htmlFor="avatar">Avatar</Label>
-
-                            <Input
-                                id="avatar"
-                                type="file"
-                                className="mt-1 block w-full"
-                                onChange={(e) => setData('avatar', e.target.files ? e.target.files[0] : null)}
-                            />
-
-                            <InputError className="mt-2" message={errors.avatar} />
-                        </div> */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-
-                            <Input
-                                id="password"
-                                type="password"
-                                className="mt-1 block w-full"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                required
-                                autoComplete="new-password"
-                                placeholder="Password"
-                            />
-
-                            <InputError className="mt-2" message={errors.password} />
-                        </div>
-
-                    </form>
-                </div>
+          {/* phone */}
+            <div className="grid gap-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                id="phone"
+                type="tel"
+                value={data.phone}
+                onChange={(e) => setData('phone', e.target.value)}
+                required
+                placeholder="Phone number"
+                autoComplete="phone"
+                />
+                <InputError message={errors.phone} className="mt-2" />
             </div>
-        </AppLayout>
-    );
+
+          {/* Password */}
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={data.password}
+              onChange={(e) => setData('password', e.target.value)}
+              required
+              placeholder="Password"
+              autoComplete="new-password"
+            />
+            <InputError message={errors.password} className="mt-2" />
+          </div>
+
+          {/* confirm password */}
+            <div className="grid gap-2">
+                <Label htmlFor="password_confirmation">Confirm Password</Label>
+                <Input
+                id="password_confirmation"
+                type="password"
+                value={data.password_confirmation}
+                onChange={(e) =>
+                    setData('password_confirmation', e.target.value)
+                }
+                required
+                placeholder="Confirm Password"
+                autoComplete="new-password"
+                />
+                <InputError
+                message={errors.password_confirmation}
+                className="mt-2"
+                />
+            </div>
+
+          <div className="flex justify-start">
+                <Button type="submit" disabled={processing}>
+                    {processing ? (
+                        <>
+                            <LoaderPinwheel className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                        </>
+                    ) : (
+                        'Create User'
+                    )}
+                </Button>
+
+                <Transition
+                    show={recentlySuccessful}
+                    enter="transition-opacity duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="transition-opacity duration-300"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <p className="text-sm text-green-600">User created successfully</p>
+                </Transition>
+          </div>
+        </form>
+      </div>
+    </AppLayout>
+  );
 }

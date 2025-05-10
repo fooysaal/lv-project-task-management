@@ -1,8 +1,10 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
+import { PageProps } from '@inertiajs/react'
 
 export interface Auth {
     user: User;
+    company: Company;
 }
 
 export interface BreadcrumbItem {
@@ -17,10 +19,11 @@ export interface NavGroup {
 
 export interface NavItem {
     title: string;
-    href: string;
-    icon?: LucideIcon | null;
+    href?: string;
+    icon: React.ComponentType<{ className?: string }>;
+    items?: NavItem[]; // For submenu items
     isActive?: boolean;
-}
+  }
 
 export interface SharedData {
     name: string;
@@ -41,3 +44,35 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Company {
+    id: number;
+    name: string;
+    email: string;
+    logo?: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties...
+}
+
+declare module '@inertiajs/react' {
+    interface PageProps {
+      stats: {
+        totalUsers: number
+        newProjects: number
+        completedProjects: number
+        pendingTasks: number
+        completedTasks: number
+        overdueTasks: number
+        userTrend: number
+        projectTrend: number
+        taskTrend: number
+        lastUpdated: string
+        taskTrends: Array<{
+          date: string
+          completed: number
+          pending: number
+        }>
+      }
+    }
+  }
