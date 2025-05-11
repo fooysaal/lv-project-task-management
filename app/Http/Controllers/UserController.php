@@ -119,6 +119,18 @@ class UserController extends Controller
     }
 
     /**
+     * Toggle the status of the specified resource.
+     */
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Status updated.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
