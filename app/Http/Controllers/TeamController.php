@@ -16,7 +16,7 @@ class TeamController extends Controller
 
         // Use the correct field for comparison
         if (in_array($user->user_type_id, [1, 2])) {
-            $teams = Team::with(['teamType', 'users:id,name,email'])->get();
+            $teams = Team::with(['teamType', 'users:id,name,email'])->where('company_id', $user->company_id)->get();
         } else {
             $teams = $user->teams()->with(['teamType', 'users:id,name,email'])->get();
         }
