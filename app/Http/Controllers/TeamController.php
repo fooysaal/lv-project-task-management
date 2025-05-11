@@ -6,22 +6,35 @@ use App\Models\Team;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Models\TeamType;
-use App\Models\TeamsUser;
 use Illuminate\Http\Request;
 
 class TeamController extends Controller
 {
     public function index()
     {
-        $teams = Team::with(['teamType', 'users:id,name,email'])->get();
+        $user = auth()->user();
+
+        // Use the correct field for comparison
+        if (in_array($user->user_type_id, [1, 2])) {
+            $teams = Team::with(['teamType', 'users:id,name,email'])->get();
+        } else {
+            $teams = $user->teams()->with(['teamType', 'users:id,name,email'])->get();
+        }
 
         return Inertia::render('teams/index', [
             'teams' => $teams,
         ]);
     }
 
+
     public function create()
     {
+        $user = auth()->user();
+
+        // Use the correct field for comparison
+        if (!in_array($user->user_type_id, [1, 2])) {
+            abort(403, 'Unauthorized action.');
+        }
         return Inertia::render('teams/create', [
             'teamTypes' => TeamType::where('is_active', 1)->where('company_id', auth()->user()->company_id)->get(),
             'users' => User::where('company_id', auth()->user()->company_id)
@@ -61,6 +74,12 @@ class TeamController extends Controller
 
     public function edit(Team $team)
     {
+        $user = auth()->user();
+
+        // Use the correct field for comparison
+        if (!in_array($user->user_type_id, [1, 2])) {
+            abort(403, 'Unauthorized action.');
+        }
         return Inertia::render('teams/edit', [
             'team' => $team->load(['teamType', 'users']),
             'teamTypes' => TeamType::where('is_active', 1)->where('company_id', auth()->user()->company_id)->get(),

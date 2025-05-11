@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -26,7 +26,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 
 type User = {
@@ -43,9 +42,22 @@ type Team = {
   users: User[];
 };
 
+type AuthUser = {
+  id: number;
+  name: string;
+  email: string;
+  user_type_id: number;
+};
+
+type PageProps = {
+  teams: Team[];
+  auth: { user: AuthUser };
+};
+
 export default function TeamIndex() {
-  const { props } = usePage();
-  const { teams } = props as { teams: Team[] };
+  const { props } = usePage<PageProps>();
+  const { teams, auth } = props;
+  const userType = auth.user.user_type_id;
 
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
@@ -58,12 +70,15 @@ export default function TeamIndex() {
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Teams</h2>
-          <Link href="/teams/create">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Team
-            </Button>
-          </Link>
+
+          {(userType === 1 || userType === 2) && (
+            <Link href="/teams/create">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Team
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="rounded-md border">
@@ -94,19 +109,23 @@ export default function TeamIndex() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/teams/${team.id}/edit`}>Edit</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link
-                            href={route('teams.destroy', team.id)}
-                            method="delete"
-                            as="button"
-                            className="w-full text-left"
-                          >
-                            Delete
-                          </Link>
-                        </DropdownMenuItem>
+                        {(userType === 1 || userType === 2) && (
+                          <>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/teams/${team.id}/edit`}>Edit</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={route('teams.destroy', team.id)}
+                                method="delete"
+                                as="button"
+                                className="w-full text-left"
+                              >
+                                Delete
+                              </Link>
+                            </DropdownMenuItem>
+                          </>
+                        )}
                         <DropdownMenuItem onClick={() => setSelectedTeam(team)}>
                           View Members
                         </DropdownMenuItem>
@@ -124,9 +143,7 @@ export default function TeamIndex() {
       <Dialog open={!!selectedTeam} onOpenChange={() => setSelectedTeam(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {selectedTeam?.name} Members
-            </DialogTitle>
+            <DialogTitle>{selectedTeam?.name} Members</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             {selectedTeam?.users.length ? (
