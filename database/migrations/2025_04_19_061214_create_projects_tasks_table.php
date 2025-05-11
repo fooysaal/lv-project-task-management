@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('updated_by')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->enum('status', ['Pending', 'In Progress', 'Completed'])->default('Pending');
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->date('due_date')->nullable();
             $table->string('attachments')->nullable();
