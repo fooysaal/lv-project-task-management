@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('dashboard');
 
     Route::get('manager-dashboard', [DashboardController::class, 'manager'])
-        // ->middleware('role:projectmanager,manager')
+        ->middleware('role:projectmanager,manager')
         ->name('manager.dashboard');
 
     Route::get('user-dashboard', [DashboardController::class, 'user'])
@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('project-categories/{id}/toggle-status', [ProjectsCategoryController::class, 'toggleStatus']);
 
     Route::resource('users', UserController::class);
+    Route::put('users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
     Route::get('update-company-info', [UserController::class, 'companyInfo']);
     Route::post('update-company', [UserController::class, 'updateCompany']);
     Route::resource('teams', TeamController::class);
@@ -70,7 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'destroy' => 'projects.tasks.destroy',
         ]);
 
-        Route::put('projects/tasks/{id}/update-status', [ProjectTaskController::class, 'updateStatus'])->name('projects.tasks.updateStatus');
+        Route::put('tasks/{id}/update-status', [ProjectTaskController::class, 'updateStatus'])->name('projects.tasks.updateStatus');
     });
     Route::resource('projects', ProjectController::class);
     Route::put('projects/{id}/update-status', [ProjectController::class, 'updateStatus'])->name('projects.updateStatus');
