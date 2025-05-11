@@ -15,17 +15,21 @@ class ProjectTaskController extends Controller
      */
     public function index()
     {
-        // Get the authenticated user's company ID
-        $companyId = auth()->user()->company_id;
+        $user = auth()->user();
+        $companyId = $user->company_id;
 
-        // Fetch tasks where the related project's company_id matches the user's company
-        $tasks = ProjectsTask::with(['project', 'assignedTo'])
-            ->whereHas('project', function ($query) use ($companyId) {
-                $query->where('company_id', $companyId);
-            })
-            ->get();
+        $query = ProjectsTask::with(['project', 'assignedTo'])
+            ->whereHas('project', function ($q) use ($companyId) {
+                $q->where('company_id', $companyId);
+            });
 
-        // Return the tasks to the view
+        // If the user is not an admin or manager (type_id 1 or 2), show only their assigned tasks
+        if (!in_array($user->user_type_id, [1, 2])) {
+            $query->where('assigned_to', $user->id);
+        }
+
+        $tasks = $query->latest()->get();
+
         return inertia('Projects/Tasks/Index', [
             'tasks' => $tasks,
         ]);
@@ -55,7 +59,6 @@ class ProjectTaskController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->all());
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -106,11 +109,31 @@ class ProjectTaskController extends Controller
         //
     }
 
+    public function updateStatus(Request $request, $taskId)
+    {
+        $request->validate([
+            'status' => 'required|string',
+            'progress' => 'required',
+            'spent_time' => 'required',
+        ]);
+
+        $task = ProjectsTask::findOrFail($taskId);
+        $task->status = $request->status ?? $task->status;
+        $task->progress = $request->progress ?? $task->progress;
+        $task->spent_time = $request->spent_time ?? $task->spent_time;
+        $task->save();
+
+        return redirect()->route('projects.tasks.index')->with('success', 'Task status updated successfully.');
+    }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($taskId)
     {
-        //
+        $task = ProjectsTask::findOrFail($taskId);
+        $task->delete();
+
+        return redirect()->route('projects.tasks.index')->with('success', 'Task deleted successfully.');
     }
 }
