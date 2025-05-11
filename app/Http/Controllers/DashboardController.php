@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Inertia\Inertia;
 use App\Models\Project;
 use App\Models\ProjectsTask;
-use App\Models\User;
 use Illuminate\Support\Carbon;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -165,25 +166,63 @@ class DashboardController extends Controller
             'stats' => $stats,
         ]);
     }
-
+    
     public function user()
     {
-        $organizationId = auth()->user()->company_id;
-
-        // Cache key specific to this organization
-        $cacheKey = 'user-dashboard-stats:org:' . $organizationId;
-
-        $stats = cache()->remember($cacheKey, now()->addMinutes(30), function() use ($organizationId) {
+        $user = auth()->user();
+        $organizationId = $user->company_id;
+        $userId = $user->id;
+    
+        $cacheKey = 'user-dashboard-stats:org:' . $organizationId . ':user:' . $userId;
+    
+        $stats = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($organizationId, $userId) {
             return [
-                'totalProjects' => Project::where('company_id', $organizationId)->count(),
-                'totalTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
-                        $q->where('company_id', $organizationId);
+                'assignedProjects' => Project::where('company_id', $organizationId)
+                    ->whereHas('tasks', function ($q) use ($userId) {
+                        $q->where('assigned_to', $userId);
                     })->count(),
+    
+                'completedProjects' => Project::where('company_id', $organizationId)
+                    ->where('status', 'completed')
+                    ->whereHas('tasks', function ($q) use ($userId) {
+                        $q->where('assigned_to', $userId);
+                    })->count(),
+    
+                'assignedTasks' => ProjectsTask::whereHas('project', function ($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })->where('assigned_to', $userId)->count(),
+    
+                'completedTasks' => ProjectsTask::whereHas('project', function ($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })->where('assigned_to', $userId)
+                    ->where('status', 'completed')->count(),
+    
+                'lastUpdated' => now()->toDateTimeString(),
             ];
         });
-
+    
+        $tasks = ProjectsTask::with('project')
+            ->whereHas('project', function ($q) use ($organizationId) {
+                $q->where('company_id', $organizationId);
+            })
+            ->where('assigned_to', $userId)
+            ->orderByDesc('updated_at')
+            ->take(10)
+            ->get()
+            ->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'name' => $task->name,
+                    'project_name' => $task->project->name ?? 'N/A',
+                    'status' => $task->status,
+                    'progress' => $task->progress,
+                    'due_date' => $task->due_date ? Carbon::parse($task->due_date)->format('Y-m-d') : 'N/A',
+                ];
+            });
+    
         return Inertia::render('user-dashboard', [
             'stats' => $stats,
+            'tasks' => $tasks,
         ]);
-    }
+    }    
 }

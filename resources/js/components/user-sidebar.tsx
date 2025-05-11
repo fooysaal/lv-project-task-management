@@ -4,49 +4,23 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { FileCode, Folder, LayoutGrid, UserCircle, Users, Shield, Activity, Tag, Copy, TableOfContents } from 'lucide-react';
+import { FileCode, Folder, LayoutGrid, Users, TableOfContents } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
       title: 'Dashboard',
-      href: '/',
+      href: '/user-dashboard',
       icon: LayoutGrid,
-    },
-    {
-      title: 'User Management',
-      icon: UserCircle,
-      items: [
-        {
-          title: 'All Users',
-          href: '/users',
-          icon: Users, // You can use different icons for subitems
-        },
-        {
-          title: 'User Types',
-          href: '/users/user-type',
-          icon: Shield,
-        },
-        // {
-        //   title: 'Activity Log',
-        //   href: '/users/activity',
-        //   icon: Activity,
-        // },
-      ],
     },
     {
         title: 'Team Management',
         icon: Users,
         items: [
           {
-            title: 'All Teams',
+            title: 'My Teams',
             href: '/teams',
             icon: Users,
-          },
-          {
-            title: 'Team Types',
-            href: '/teams/team-type',
-            icon: Shield,
           },
         ],
       },
@@ -55,20 +29,10 @@ const mainNavItems: NavItem[] = [
       icon: FileCode,
       items: [
         {
-          title: 'All Projects',
+          title: 'My Projects',
           href: '/projects',
           icon: Folder,
         },
-        {
-          title: 'Categories',
-          href: '/project-categories',
-          icon: Tag,
-        },
-        // {
-        //   title: 'Templates',
-        //   href: '/projects/templates',
-        //   icon: Copy,
-        // },
       ],
     },
     {
@@ -76,7 +40,7 @@ const mainNavItems: NavItem[] = [
       icon: TableOfContents,
       items: [
         {
-          title: 'All Tasks',
+          title: 'My Tasks',
           href: '/projects/tasks',
           icon: Folder,
         },
@@ -92,14 +56,14 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-export function AppSidebar() {
+export function UserSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="/user-dashboard" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
