@@ -14,10 +14,20 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with(['team', 'category'])
-                    ->withTrashed()
-                    ->where('company_id', auth()->user()->company_id)
-                    ->get();
+        $user = auth()->user();
+
+        // Start the base query for the same company
+        $query = Project::with(['team', 'category'])
+                        ->withTrashed()
+                        ->where('company_id', $user->company_id);
+
+        if (!in_array($user->user_type_id, [1, 2])) {
+            // Only get projects where the user's team is assigned
+            $teamIds = $user->teams()->pluck('teams.id');
+            $query->whereIn('team_id', $teamIds);
+        }
+
+        $projects = $query->get();
 
         return inertia('Projects/Index', ['projects' => $projects]);
     }
@@ -114,6 +124,16 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
     }
 
+    public function updateStatus(Request $request, $projectId)
+    {
+        $project = Project::findOrFail($projectId);
+        $project->status = $request->input('status', $project->status);
+        $project->progress = $request->input('progress', $project->progress);
+        $project->save();
+
+        return redirect()->route('projects.index')->with('success', 'Project status updated successfully.');
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -138,26 +158,5 @@ class ProjectController extends Controller
         $project->forceDelete();
 
         return redirect()->route('projects.index')->with('success', 'Project permanently deleted successfully.');
-    }
-
-    public function updateStatus(Request $request, Project $project)
-    {
-        dd($request->all());
-        if($request->has('status')) {
-            $data = $request->validate([
-                'status' => 'required|string',
-            ]);
-        } else {
-            $data = $request->validate([
-                'progress' => 'required|integer|min:0|max:100',
-            ]);
-        }
-
-        $data['status'] = $request->input('status', $project->status);
-        $data['progress'] = $request->input('progress', $project->progress);
-
-        $project->update($data);
-
-        return redirect()->route('projects.index')->with('success', 'Project status updated successfully.');
     }
 }
