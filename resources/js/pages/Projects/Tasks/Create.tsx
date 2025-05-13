@@ -111,7 +111,7 @@ export default function CreateTask({ projects }: { projects: any[] }) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                {['Pending', 'Ongoing', 'Completed'].map((status) => (
+                                {['Pending', 'In Progress', 'Completed'].map((status) => (
                                     <SelectItem key={status} value={status}>
                                         {status}
                                     </SelectItem>

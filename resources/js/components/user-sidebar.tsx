@@ -52,7 +52,7 @@ const footerNavItems: NavItem[] = [
     {
         title: 'Project Repositories',
         href: 'projects/repositories',
-        icon: Folder,
+        icon: TableOfContents,
     },
 ];
 

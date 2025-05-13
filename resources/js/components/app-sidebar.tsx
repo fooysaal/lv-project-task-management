@@ -10,7 +10,7 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
       title: 'Dashboard',
-      href: '/',
+      href: '/dashboard',
       icon: LayoutGrid,
     },
     {
@@ -87,7 +87,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Project Repositories',
-        href: 'projects/repositories',
+        href: '/projects/repositories',
         icon: Folder,
     },
 ];
