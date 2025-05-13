@@ -14,22 +14,21 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
-
-        // Start the base query for the same company
-        $query = Project::with(['team', 'category'])
-                        ->withTrashed()
-                        ->where('company_id', $user->company_id);
-
-        if (!in_array($user->user_type_id, [1, 2])) {
-            // Only get projects where the user's team is assigned
-            $teamIds = $user->teams()->pluck('teams.id');
-            $query->whereIn('team_id', $teamIds);
+        if (auth()->user()->user_type_id == 1 || auth()->user()->user_type_id == 2) {
+        $projects = Project::with(['team', 'category'])
+                    ->withTrashed()
+                    ->where('company_id', auth()->user()->company_id)
+                    ->get();
+        } else {
+            $projects = Project::with(['team', 'category'])
+                ->where('company_id', auth()->user()->company_id)
+                ->where('team_id', auth()->user()->team_id)
+                ->get();
         }
 
-        $projects = $query->get();
-
-        return inertia('Projects/Index', ['projects' => $projects]);
+        return inertia('Projects/Index', [
+            'projects' => $projects
+        ]);
     }
 
     /**
@@ -40,7 +39,7 @@ class ProjectController extends Controller
         return inertia('Projects/Create', [
             'teams' => Team::where('company_id', auth()->user()->company_id)->get(['id', 'name']),
             'categories' => ProjectsCategory::where('company_id', auth()->user()->company_id)->get(['id', 'name']),
-            'currencies' => ['USD', 'EUR', 'INR'],
+            'currencies' => ['BDT', 'USD', 'EUR', 'INR'],
             'statuses' => ['pending', 'in progress', 'completed'],
             'priorities' => ['low', 'medium', 'high'],
         ]);

@@ -14,12 +14,12 @@ class CompanyProjectRepositoryController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('repositories')
+        $repositories = CompanyProjectRepository::with('project') // ✅ eager load project
             ->where('company_id', auth()->user()->company_id)
             ->get();
 
         return inertia('Projects/Repositories/Index', [
-            'project' => $projects,
+            'repositories' => $repositories,
             'repositoryTypes' => [
                 'github' => 'GitHub',
                 'gitlab' => 'GitLab',
@@ -35,12 +35,10 @@ class CompanyProjectRepositoryController extends Controller
      */
     public function create()
     {
-        $projects = Project::where('company_id', auth()->user()->company_id)
-            ->whereDoesntHave('repositories') // assumes a `repository` relation
-            ->get(['id', 'name']);
-
+        $repositories = CompanyProjectRepository::where('company_id', auth()->user()->company_id)
+            ->get();
         return inertia('Projects/Repositories/Create', [
-            'projects' => $projects,
+            'repositories' => $repositories,
             'types' => [
                 'github' => 'GitHub',
                 'gitlab' => 'GitLab',
@@ -56,21 +54,23 @@ class CompanyProjectRepositoryController extends Controller
      */
     public function store(Request $request, Project $project)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'type' => ['required', Rule::in(['github', 'gitlab', 'bitbucket', 'azure', 'other'])],
             'url' => ['required', 'url', 'max:255'],
             'display_name' => ['nullable', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:255']
+            'description' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $project->repositories()->create([
-            ...$validated,
-            'company_id' => $project->company_id
-        ]);
+        $repository = new CompanyProjectRepository($validated);
+        $repository->project_id = $request->project_id;
+        $repository->company_id = auth()->user()->company_id; // Assuming you have a company_id field in your repositories table
+        $repository->save();
 
         return redirect()->route('projects.repositories.index', $project)
             ->with('success', 'Repository added successfully.');
     }
+
 
     /**
      * Display the specified resource.

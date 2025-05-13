@@ -10,7 +10,8 @@ class ProjectsCategoryController extends Controller
 {
     public function index()
     {
-        $categories = ProjectsCategory::latest()->get();
+        $categories = ProjectsCategory::where('company_id', auth()->user()->company_id)
+        ->latest()->get();
         return Inertia::render('project-categories/index', [
             'categories' => $categories
         ]);

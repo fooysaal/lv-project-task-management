@@ -75,11 +75,11 @@ class ProjectTaskController extends Controller
         $task->project_id = $request->project_id;
         $task->assigned_to = $request->assigned_to;
         $task->due_date = $request->due_date;
-        $task->priority = $request->priority;
+        $task->priority = strtolower($request->priority);
         $task->estimated_time = $request->estimated_time;
         $task->created_by = auth()->user()->id;
         $task->updated_by = auth()->user()->id;
-        $task->attachments = $request->attachments ?? null; // Assuming attachments is a JSON field
+        $task->attachments = $request->attachments ? json_encode($request->attachments) : null;
         $task->save();
 
         return redirect()->route('projects.tasks.index')->with('success', 'Task created successfully.');
@@ -121,6 +121,7 @@ class ProjectTaskController extends Controller
         $task->status = $request->status ?? $task->status;
         $task->progress = $request->progress ?? $task->progress;
         $task->spent_time = $request->spent_time ?? $task->spent_time;
+        $task->updated_by = auth()->user()->id;
         $task->save();
 
         return redirect()->route('projects.tasks.index')->with('success', 'Task status updated successfully.');

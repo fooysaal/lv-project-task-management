@@ -39,16 +39,16 @@ class DashboardController extends Controller
                 'pendingTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })
-                    ->where('status', 'pending')->count(),
+                    ->where('status', 'Pending')->count(),
                 'completedTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })
-                    ->where('status', 'completed')->count(),
+                    ->where('status', 'Completed')->count(),
                 'overdueTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })
                     ->where('due_date', '<', $now)
-                    ->where('status', '!=', 'completed')
+                    ->where('status', '!=', 'Completed')
                     ->count(),
                 'taskTrend' => $this->calculateTaskTrend($organizationId),
 
@@ -96,14 +96,14 @@ class DashboardController extends Controller
         $currentPeriodCount = ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                 $q->where('company_id', $organizationId);
             })
-            ->where('status', 'completed')
+            ->where('status', 'Completed')
             ->where('updated_at', '>=', now()->subDays(30))
             ->count();
 
         $previousPeriodCount = ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                 $q->where('company_id', $organizationId);
             })
-            ->where('status', 'completed')
+            ->where('status', 'Completed')
             ->whereBetween('updated_at', [now()->subDays(60), now()->subDays(30)])
             ->count();
 
@@ -129,8 +129,8 @@ class DashboardController extends Controller
             })
             ->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('DATE(created_at) as date,
-                    SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
-                    SUM(CASE WHEN status != "completed" THEN 1 ELSE 0 END) as pending')
+                    SUM(CASE WHEN status = "Completed" THEN 1 ELSE 0 END) as completed,
+                    SUM(CASE WHEN status != "Completed" THEN 1 ELSE 0 END) as pending')
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -159,6 +159,46 @@ class DashboardController extends Controller
                 'totalTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })->count(),
+                'completedProjects' => Project::where('company_id', $organizationId)
+                    ->where('status', 'completed')->count(),
+                'completedTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })
+                    ->where('status', 'completed')->count(),
+                'pendingTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })
+                    ->where('status', 'Pending')->count(),
+                'overdueTasks' => ProjectsTask::whereHas('project', function($q) use ($organizationId) {
+                        $q->where('company_id', $organizationId);
+                    })
+                    ->where('due_date', '<', now())
+                    ->where('status', '!=', 'Completed')
+                    ->count(),
+                'lastUpdated' => now()->toDateTimeString(),
+                'taskTrends' => $this->getTaskTrends($organizationId),
+                'projectTrends' => Project::where('company_id', $organizationId)
+                    ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'date' => $item->date,
+                            'count' => $item->count,
+                        ];
+                    }),
+                'userTrends' => User::where('company_id', $organizationId)
+                    ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'date' => $item->date,
+                            'count' => $item->count,
+                        ];
+                    }),
             ];
         });
 
@@ -166,41 +206,41 @@ class DashboardController extends Controller
             'stats' => $stats,
         ]);
     }
-    
+
     public function user()
     {
         $user = auth()->user();
         $organizationId = $user->company_id;
         $userId = $user->id;
-    
+
         $cacheKey = 'user-dashboard-stats:org:' . $organizationId . ':user:' . $userId;
-    
+
         $stats = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($organizationId, $userId) {
             return [
                 'assignedProjects' => Project::where('company_id', $organizationId)
                     ->whereHas('tasks', function ($q) use ($userId) {
                         $q->where('assigned_to', $userId);
                     })->count(),
-    
+
                 'completedProjects' => Project::where('company_id', $organizationId)
                     ->where('status', 'completed')
                     ->whereHas('tasks', function ($q) use ($userId) {
                         $q->where('assigned_to', $userId);
                     })->count(),
-    
+
                 'assignedTasks' => ProjectsTask::whereHas('project', function ($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })->where('assigned_to', $userId)->count(),
-    
+
                 'completedTasks' => ProjectsTask::whereHas('project', function ($q) use ($organizationId) {
                         $q->where('company_id', $organizationId);
                     })->where('assigned_to', $userId)
-                    ->where('status', 'completed')->count(),
-    
+                    ->where('status', 'Completed')->count(),
+
                 'lastUpdated' => now()->toDateTimeString(),
             ];
         });
-    
+
         $tasks = ProjectsTask::with('project')
             ->whereHas('project', function ($q) use ($organizationId) {
                 $q->where('company_id', $organizationId);
@@ -219,10 +259,10 @@ class DashboardController extends Controller
                     'due_date' => $task->due_date ? Carbon::parse($task->due_date)->format('Y-m-d') : 'N/A',
                 ];
             });
-    
+
         return Inertia::render('user-dashboard', [
             'stats' => $stats,
             'tasks' => $tasks,
         ]);
-    }    
+    }
 }
