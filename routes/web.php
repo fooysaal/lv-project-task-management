@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('dashboard');
 
     Route::get('manager-dashboard', [DashboardController::class, 'manager'])
-        ->middleware('role:projectmanager,manager')
+        ->middleware('role:project manager')
         ->name('manager.dashboard');
 
     Route::get('user-dashboard', [DashboardController::class, 'user'])
