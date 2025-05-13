@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Models\Project;
+use App\Models\ProjectsTask;
+use App\Observers\UserObserver;
+use App\Observers\ProjectObserver;
+use App\Observers\ProjectsTaskObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Project::observe(ProjectObserver::class);
+        ProjectsTask::observe(ProjectsTaskObserver::class);
+        User::observe(UserObserver::class);
     }
 }
